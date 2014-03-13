@@ -1,0 +1,213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<meta name="viewport" content="initial-scale=1, maximum-scale=1,user-scalable=no"/>
+		<title>Crime Mapper</title>		
+		<link async rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/dojo/dijit/themes/tundra/tundra.css">
+		<link rel="stylesheet" type="text/css" href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/css/esri.css" />
+		<link rel="stylesheet" type="text/css"
+		href="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2/js/esri/dijit/css/Popup.css"/>
+		<link rel="stylesheet" type="text/css" href="assets/site.css">
+		<!--[if lt IE 9]>
+		<script type="text/javascript" src="assets/excanvas.compiled.js"></script>
+		<![endif]-->
+		<script>
+			var dojoConfig = {
+				isDebug : false,
+				debugAtAllCosts : false,
+				parseOnLoad : true
+			};
+		</script>
+		
+		<script src="http://serverapi.arcgisonline.com/jsapi/arcgis/3.2compact/"></script>
+	
+		<script type="text/javascript" >	
+			dojo.require("dijit.dijit");
+			dojo.require("dijit.layout.BorderContainer");
+			dojo.require("dijit.layout.ContentPane");
+			dojo.require("dijit.form.Form");
+			dojo.require("dijit.form.Button");
+			dojo.require("dijit.form.CheckBox");
+			dojo.require("dijit.form.Select");
+			dojo.require("dijit.form.RadioButton");
+			dojo.require("dijit.Dialog");
+			dojo.require("dijit.TooltipDialog");
+		</script>
+		<script type="text/javascript" src="assets/heatlayer.js"></script>
+		<script type="text/javascript" src="assets/cluster.js"></script>
+	</head>
+	<body class='tundra'>
+		<div id="mainWindow" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="design:'headline',gutters:false" style="width: 100%; height: 100%; margin: 0;padding:0;">
+			<div id="header" data-dojo-type="dijit.layout.ContentPane"  data-dojo-props="region:'top'">
+				<span style="font-size:24px;display:block;vertical-align: middle;">San Francisco Crime Mapper</span>				
+			</div>
+			<div id="centerDiv" data-dojo-type="dijit.layout.BorderContainer" data-dojo-props="region:'center',design:'headline',gutters:false" style="width: 100%; height: 100%; margin: 0;">
+				<div id="" data-dojo-type="dijit.layout.ContentPane"  data-dojo-props="region:'top'" style="border:1px solid #ccc;height:130px;margin: 0;padding:0;">
+					<div id="centerDiv_options" style="margin:0px auto;position:relative;width:960px;border:0px solid #e00;visibility: hidden;">
+						<form id="optionsForm" data-dojo-type="dijit.form.Form" data-dojo-props=''>
+							<table class="" style="border:0px solid #aaa;width:100%;font-size:18px;margin:10px 0;vertical-align:middle;" cellspacing="0">
+								<tr>
+									<td class="" style="border-right:1px dashed #aaa;padding:0;vertical-align:top;">
+									<center>
+										Map View
+									</center>
+									<input id="rb2" data-dojo-type="dijit.form.RadioButton" data-dojo-props='name:"rb", disabled:false, checked:true, value:"cluster", readOnly:false, onClick:showhideCluster'/>
+									<label for="rb2">Cluster</label>
+									<br/>
+									<input id="rb3" data-dojo-type="dijit.form.RadioButton" data-dojo-props='name:"rb", disabled:false, checked:false, value:"heatmap", readOnly:false, onClick:showhideHeatMap'/>
+									<label for="rb3">Heatmap</label>
+									<br/>
+									<input id="rb1" data-dojo-type="dijit.form.RadioButton" data-dojo-props='name:"rb", disabled:true, checked:false, value:"crimepoints", readOnly:false, onClick:showhidePoints'/>
+									<label for="rb1">Points</label></td>
+									<td class="" style="padding:0;vertical-align:top;text-align: center;">
+									<center>
+										Crime Categories
+									</center>
+									<select id="s2" data-dojo-id="s2" data-dojo-type="dijit.form.Select" data-dojo-props='onChange: setCategory, maxHeight:400, maxWidth:200 '>										
+										<option value="ARSON" selected="selected">ARSON</option>										
+										<option value="ASSAULT">ASSAULT</option>
+										<option value="BRIBERY">BRIBERY</option>
+										<option value="BURGLARY">BURGLARY</option>										
+										<option value="DISORDERLY CONDUCT">DISORDERLY CONDUCT</option>
+										<option value="DRIVING UNDER THE INFLUENCE">DUI</option>										
+										<option value="DRUG/NARCOTIC">Drug/Narcotic</option>										
+										<option value="DRUNKENNESS">DRUNKENNESS</option>	
+										<option value="EMBEZZLEMENT">EMBEZZLEMENT</option>	
+										<option value="EXTORTION">EXTORTION</option>
+										<option value="FAMILY OFFENSES">FAMILY OFFENSES</option>
+										<option value="FORGERY/COUNTERFEITING">FORGERY/COUNTERFEITING</option>
+										<option value="FRAUD">FRAUD</option>
+										<option value="GAMBLING">GAMBLING</option>
+										<option value="KIDNAPPING">KIDNAPPING</option>
+										<option value="LARCENY/THEFT">LARCENY/THEFT</option>
+										<option value="LIQUOR LAWS">LIQUOR LAWS</option>
+										<option value="LOITERING">LOITERING</option>																		
+										<option value="MISSING PERSON">MISSING PERSON</option>
+										<option value="NON-CRIMINAL">Non-Criminal</option>
+										<option value="OTHER OFFENSES">Other Offenses</option>
+										<option value="PORNOGRAPHY/OBSCENE MAT">PORNOGRAPHY/OBSCENE MATERIAL</option>
+										<option value="PROSTITUTION">PROSTITUTION</option>
+										<option value="ROBBERY">ROBBERY</option>
+										<option value="RUNAWAY">RUNAWAY</option>
+										<option value="SEX OFFENSES, FORCIBLE">SEX OFFENSES, FORCIBLE</option>
+										<option value="SEX OFFENSES, NON FORCIBLE">SEX OFFENSES, NON FORCIBLE</option>
+										<option value="STOLEN PROPERTY">STOLEN PROPERTY</option>
+										<option value="SUICIDE">SUICIDE</option>
+										<option value="SUSPICIOUS OCC">SUSPICIOUS OCCURRENCE</option>										
+										<option value="TRESPASS">TRESPASSING</option>
+										<option value="VANDALISM">VANDALISM</option>
+										<option value="VEHICLE THEFT">VEHICLE THEFT</option>										
+										<option value="WARRANTS">WARRANTS</option>
+										<option value="WEAPON LAWS">WEAPON LAWS</option>
+										<option value="" disabled="true">--------------</option>										
+										<option value="ALL">All Categories</option>
+									</select>
+									<span class='block' id="category_info"></span>	 
+									</td>
+									<td style="border-left:1px dashed #aaa;padding:0px;vertical-align:top;text-align: center;width:200px;">
+									<center>
+										Police District
+									</center>
+									<select id="s1" data-dojo-id="s1" data-dojo-type="dijit.form.Select" data-dojo-props='name:"s1", onChange: changeDistrict '>
+										<option value="ALL">All</option>
+										<option value="CENTRAL">Central</option>
+										<option value="SOUTHERN">Southern</option>
+										<option value="BAYVIEW">Bayview</option>
+										<option value="MISSION">Mission</option>
+										<option value="NORTHERN">Northern</option>
+										<option value="PARK">Park</option>
+										<option value="RICHMOND">Richmond</option>
+										<option value="INGLESIDE">Ingleside</option>
+										<option value="TARAVAL">Taraval</option>
+										<option value="TENDERLOIN">Tenderloin</option>
+									</select>
+									<span class='block' id="district_info"></span>																	
+									</td>
+									<td style="border-left:1px dashed #aaa;padding:0px;vertical-align:top;text-align: center;width:200px;">										
+										<center>
+											Choose Year
+										</center>	
+										<select id="s5" data-dojo-id="s5" data-dojo-type="dijit.form.Select" data-dojo-props='name:"s5", onChange: changeYear '>
+											<option value="2012" selected="selected">2012*</option>
+											<option value="2011">2011</option>
+											<option value="2010">2010</option>		
+											<option value="2009">2009</option>		
+											<option value="2008">2008</option>		
+											<option value="2007">2007</option>		
+											<option value="2006">2006</option>											
+											<option value="2005">2005</option>	
+											<option value="2004">2004</option>											
+											<option value="2003">2003</option>											
+										</select>						
+									</td>
+									<td style="border-left:1px dashed #aaa;padding:0px;vertical-align:top;text-align: center;width:200px;">
+										<center>
+											Choose Day
+										</center>
+										<select id="s3" data-dojo-id="s3" data-dojo-type="dijit.form.Select" data-dojo-props='name:"s3", onChange: changeDays '>
+											<option value="ALL">All Days (Mon-Sun)</option>
+											<option value="workweek">Workweek (Mon-Fri)</option>
+											<option value="weekends">Weekend (Sat-Sun)</option>		
+										</select>	
+										<center>
+											Choose Time
+										</center>
+										<select id="s4" data-dojo-id="s4" data-dojo-type="dijit.form.Select" data-dojo-props='name:"s4", onChange: changeTime '>
+											<option value="ALL">All (12am-12pm)</option>
+											<option value="day">Day (6am-8pm)</option>
+											<option value="night">Night (8pm-6am)</option>
+											<option value="commute">Commute (7-9am|5-7pm)</option>
+											<option value="nightlife">Night Life (9pm-2am)</option>
+										</select>	
+										<span class='block' id="time_info"></span>									
+									</td>
+								</tr>
+							</table>
+						</form>
+					</div>
+				</div>
+				<div id="centerDiv_map" data-dojo-type="dijit.layout.ContentPane"  data-dojo-props="region:'center'" style="margin:0;padding:0;visibility: hidden;">
+					<img id="loadingImage" class='shadow' src="assets/loading6.gif" style="display:none;position:absolute;top:50px;right:10px;width:109px;height:16px;z-index:99;border:none;"/>
+					<div id="dropdowner" class="textshadow round shadow" style="position:absolute; right:5px; top:2px; z-Index:99;" dojoType="dijit.form.DropDownButton" label="Basemap Picker" style="" showLabel="true" iconClass="">
+						<div id="tooltipper" class="textshadow" dojotype="dijit.TooltipDialog" style="max-width:400px;" title="Choose your basemap" execute="">
+							<div class="textshadow" id="basemapGallery">
+							</div>
+						</div>
+					</div>
+					<span id="cmap_info" class="textshadow round shadow" style="background-color:#222;color:#fff;font-size:16px;text-align:center;padding:5px 10px;z-index:99;position:absolute;top:5px;right:165px;"> Loading ..... </span>
+					
+					<span class="legend round shadow" id="cmap_legend" style="display:none;z-index:99;position:absolute;left:10px;bottom:5px;width:180px;">
+						<!--
+						<fieldset class="round" style="margin:0;padding:10px 0;text-align: center;">
+							<legend style="margin-left:10px;font-weight:bold;">								
+							</legend>							
+						</fieldset>
+						-->						
+					</span>					
+				</div>
+			</div>
+			<div id="footer" data-dojo-type="dijit.layout.ContentPane"  data-dojo-props="region:'bottom'" style="font-size:12px;font-family: 'Helvetica Neue', Helvetica, Arial;">
+				<div style='position:absolute;right:5px;bottom:5px;font-size:12px;font-family: "Helvetica Neue", Helvetica, Arial;'>
+					<span id="coordsinfo" style="padding: 0 5px 0 0;"></span>&nbsp;|&nbsp;<span id="scaleinfo" style="padding: 0 5px;"></span>
+				</div>
+				Data: <a href="http://www.datasf.org/story.php?title=crime-incident-data" target="_blank" title="Link opens in new window">http://www.datasf.org</a>&nbsp;&nbsp;|&nbsp;&nbsp; App: <a href="https://maps.esri.com/demo" target="_blank" title="Link opens in new window">Esri Applications Prototype Lab</a>
+				<span id="loadtime_info" style="position:absolute;left:5px;bottom:5px;font-size:11px;"></span>
+			</div>
+		</div>
+		<script type="text/javascript" src="assets/app.js"></script>	
+		<script type="text/javascript">
+			dojo.require("esri.map");
+			dojo.require("esri.tasks.query");
+			dojo.require("esri.layers.FeatureLayer");
+			dojo.require("esri.dijit.Popup");
+			dojo.require("esri.dijit.BasemapGallery");
+			dojo.require("esri.geometry");
+			dojo.require("esri.layers.FeatureLayer");
+			dojo.require('esri.dijit.Attribution');
+			dojo.ready(init);				
+		</script>
+
+	</body>
+</html>
